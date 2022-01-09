@@ -817,3 +817,75 @@ bool UniversalTelegramBot::answerCallbackQuery(const String &query_id, const Str
   closeClient();
   return answer;
 }
+
+String UniversalTelegramBot::sendPostLocation(JsonObject payload) {
+
+  bool sent = false;
+  String response = "";
+  #ifdef TELEGRAM_DEBUG  
+    Serial.println(F("sendPostPhoto: SEND Post Location"));
+  #endif
+  unsigned long sttime = millis();
+
+  if (payload.containsKey("latitude") && payload.containsKey("longitude")) {
+    while (millis() - sttime < 8000ul) { // loop for a while to send the message
+      response = sendPostToTelegram(BOT_CMD("sendLocation"), payload);
+      #ifdef TELEGRAM_DEBUG  
+        Serial.println(response);
+      #endif
+      sent = checkForOkResponse(response);
+      if (sent) break;
+      
+    }
+  }
+
+  closeClient();
+  return response;
+}
+
+// bool UniversalTelegramBot::sendLocation(const String& chat_id, float latitude,
+//                                         float longitude, float horizontal_accuracy,
+//                                         int live_period, int heading, int proximity_alert_radius,
+//                                         bool disable_notification, bool protect_content,
+//                                         int reply_to_message_id, bool allow_sending_without_reply,
+//                                         const String& keyboard) { // added message_id
+bool UniversalTelegramBot::sendLocation(const String& chat_id, float latitude,
+                                        float longitude, bool disable_notification,
+                                        int reply_to_message_id, const String& keyboard) {
+
+  DynamicJsonDocument payload(maxMessageLength);
+  payload["chat_id"] = chat_id;
+  payload["latitude"] = latitude;
+  payload["longitude"] = longitude;
+
+  // if (horizontal_accuracy)
+  //     payload["horizontal_accuracy"] = horizontal_accuracy;
+      
+  // if (live_period)
+  //     payload["live_period"] = live_period;
+
+  // if (heading)
+  //     payload["heading"] = heading;
+  
+  // if (proximity_alert_radius)
+  //     payload["proximity_alert_radius"] = proximity_alert_radius;
+
+  if (disable_notification)
+      payload["disable_notification"] = disable_notification;
+
+  // if (protect_content)
+  //     payload["protect_content"] = protect_content;
+
+  if (reply_to_message_id && reply_to_message_id != 0)
+      payload["reply_to_message_id"] = reply_to_message_id;
+      
+  // if (allow_sending_without_reply)
+  //     payload["allow_sending_without_reply"] = allow_sending_without_reply;
+
+  if (keyboard.length() > 0) {
+    JsonObject replyMarkup = payload.createNestedObject("reply_markup");
+    replyMarkup["keyboard"] = serialized(keyboard);
+  }
+
+  return sendPostLocation(payload.as<JsonObject>()); // if message id == 0 then edit is false, else edit is true
+}

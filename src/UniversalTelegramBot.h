@@ -118,6 +118,12 @@ public:
 
   int getUpdates(long offset);
   bool checkForOkResponse(const String& response);
+
+  String sendPostLocation(JsonObject payload);
+  bool sendLocation(const String& chat_id, float latitude,float longitude, 
+                            bool disable_notification = false,
+                            int reply_to_message_id = 0, const String& keyboard = "");
+
   telegramMessage messages[HANDLE_MESSAGES];
   long last_message_received;
   String name;

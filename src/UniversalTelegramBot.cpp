@@ -699,6 +699,26 @@ String UniversalTelegramBot::sendPhotoByBinary(
   return response;
 }
 
+String UniversalTelegramBot::sendFileByBinary(
+    const String& chat_id, const String& contentType, int fileSize, const String& fileName, 
+    MoreDataAvailable moreDataAvailableCallback,
+    GetNextByte getNextByteCallback, GetNextBuffer getNextBufferCallback, GetNextBufferLen getNextBufferLenCallback) {
+
+  #ifdef TELEGRAM_DEBUG  
+    Serial.println(F("sendFileByBinary: SEND File"));
+  #endif
+
+  String response = sendMultipartFormDataToTelegram("sendDocument", "document", fileName,
+    contentType, chat_id, fileSize,
+    moreDataAvailableCallback, getNextByteCallback, getNextBufferCallback, getNextBufferLenCallback);
+
+  #ifdef TELEGRAM_DEBUG  
+    Serial.println(response);
+  #endif
+
+  return response;
+}
+
 String UniversalTelegramBot::sendPhoto(const String& chat_id, const String& photo,
                                        const String& caption,
                                        bool disable_notification,

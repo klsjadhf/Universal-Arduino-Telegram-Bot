@@ -106,6 +106,12 @@ public:
                    bool disable_notification = false,
                    int reply_to_message_id = 0, const String& keyboard = "");
 
+  String sendFileByBinary(const String& chat_id, const String& contentType, int fileSize, const String& fileName, 
+                            MoreDataAvailable moreDataAvailableCallback,
+                            GetNextByte getNextByteCallback, 
+                            GetNextBuffer getNextBufferCallback, 
+                            GetNextBufferLen getNextBufferLenCallback);
+
   bool answerCallbackQuery(const String &query_id,
                            const String &text = "",
                            bool show_alert = false,
